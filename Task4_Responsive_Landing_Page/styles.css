@@ -453,15 +453,25 @@ body {
     background: rgba(255, 255, 255, 0.1);
     color: white;
     text-decoration: none;
-    font-size: 1rem;
     transition: var(--transition);
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-icons a svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transition: var(--transition);
 }
 
 .social-icons a:hover {
     background: var(--secondary);
     transform: translateY(-4px) scale(1.05);
     border-color: transparent;
+}
+
+.social-icons a:hover svg {
+    fill: white;
 }
 
 .footer-bottom {
@@ -478,6 +488,10 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: 32px;
     }
+
+    .hero .container {
+        gap: 32px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -489,14 +503,23 @@ body {
         padding: 0 20px;
     }
 
+    .header .container {
+        padding: 16px 20px;
+    }
+
+    .logo h2 {
+        font-size: 1.5rem;
+    }
+
     .nav-menu {
         position: fixed;
-        top: 80px;
+        top: 70px;
         left: -100%;
         width: 100%;
-        height: calc(100vh - 80px);
+        height: calc(100vh - 70px);
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         flex-direction: column;
         align-items: center;
         padding: 40px 20px 20px;
@@ -511,7 +534,7 @@ body {
 
     .nav-menu a {
         font-size: 1.1rem;
-        padding: 12px 0;
+        padding: 16px 0;
     }
 
     .hamburger {
@@ -535,16 +558,29 @@ body {
     }
 
     .hero {
-        padding: 80px 0 60px;
+        padding: 70px 0 50px;
+        text-align: center;
+    }
+
+    .hero .container {
+        gap: 32px;
+    }
+
+    .hero-content {
+        max-width: 100%;
     }
 
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
         line-height: 1.2;
+        margin-bottom: 16px;
     }
 
     .hero p {
         font-size: 1.1rem;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 28px;
     }
 
     .cta-button {
@@ -557,12 +593,22 @@ body {
     }
 
     .features h2 {
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
 
     .features-grid {
         grid-template-columns: 1fr;
         gap: 40px;
+    }
+
+    .feature-card {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        max-width: 500px;
+        margin: 0 auto;
     }
 }
 
@@ -575,36 +621,46 @@ body {
         padding: 14px 16px;
     }
 
+    .logo h2 {
+        font-size: 1.4rem;
+    }
+
     .nav-menu {
-        top: 72px;
+        top: 64px;
     }
 
     .hero {
-        padding: 70px 0 50px;
+        padding: 60px 0 40px;
     }
 
     .hero h1 {
-        font-size: 2.1rem;
+        font-size: 1.875rem;
+        letter-spacing: -0.4px;
     }
 
     .hero p {
         font-size: 1rem;
+        line-height: 1.6;
     }
 
     .hero-img {
-        width: 220px;
+        width: 180px;
     }
 
     .features {
-        padding: 60px 0;
+        padding: 60px 0 50px;
     }
 
     .features h2 {
-        font-size: 1.9rem;
+        font-size: 1.75rem;
+    }
+
+    .features-grid {
+        gap: 32px;
     }
 
     .feature-card {
-        padding: 32px 24px 24px;
+        padding: 32px 20px 24px;
     }
 
     .feature-icon {
@@ -612,6 +668,15 @@ body {
         height: 60px;
         font-size: 1.25rem;
         margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 14px;
+    }
+
+    .feature-card p {
+        font-size: 1rem;
     }
 
     .footer {
@@ -624,16 +689,86 @@ body {
         gap: 40px;
     }
 
+    .footer-section h3 {
+        font-size: 1.3rem;
+    }
+
     .footer-section h3::after {
         left: 50%;
         transform: translateX(-50%);
     }
 
+    .footer-section {
+        max-width: 100%;
+        margin: 0;
+    }
+
     .social-icons {
         justify-content: center;
+        gap: 14px;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
     }
 
     .footer-bottom {
         font-size: 0.85rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .hero p {
+        font-size: 0.95rem;
+    }
+
+    .cta-button {
+        padding: 12px 28px;
+        font-size: 1rem;
+    }
+
+    .features h2 {
+        font-size: 1.6rem;
+    }
+
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.1rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .social-icons a {
+        width: 36px;
+        height: 36px;
+    }
+
+    .social-icons a svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Landscape mobile devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        padding: 40px 0 30px;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .features-grid {
+        gap: 24px;
     }
 }
