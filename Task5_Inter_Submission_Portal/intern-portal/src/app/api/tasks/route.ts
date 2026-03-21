@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createTaskSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
+import { Task, ApiResponse, TasksResponse } from "@/types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
       return apiError("User not found", 404);
     }
 
-    let tasks;
+    let tasks: Task[] | (Task & { user: { id: string; name: string | null; email: string } })[];
 
     if (user.role === "ADMIN") {
       // Admin sees all tasks with user info
@@ -56,7 +57,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return apiSuccess({ tasks });
+    return apiSuccess<{ tasks: Task[] | (Task & { user: { id: string; name: string | null; email: string } })[] }>({ tasks });
   } catch (error) {
     console.error("Fetch tasks error:", error);
     if (error instanceof Error && error.message === "Request timeout") {
@@ -109,13 +110,7 @@ export async function POST(req: NextRequest) {
       DB_QUERY_TIMEOUT_MS
     );
 
-    return apiSuccess(
-      {
-        message: "Task submitted successfully",
-        task,
-      },
-      201
-    );
+    return apiSuccess<{ task: Task }>({ task });
   } catch (error) {
     console.error("Task submission error:", error);
     if (error instanceof Error && error.message === "Request timeout") {

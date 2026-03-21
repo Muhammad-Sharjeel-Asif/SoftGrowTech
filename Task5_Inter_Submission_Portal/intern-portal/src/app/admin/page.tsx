@@ -44,6 +44,8 @@ export default async function AdminDashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  const typedUsers = users as UserWithTaskCount[];
+
   // Parallel queries for better performance
   const [tasks, totalTasks, pendingTasks, approvedTasks] = await Promise.all([
     prisma.task.findMany({
@@ -67,8 +69,10 @@ export default async function AdminDashboardPage() {
     prisma.task.count({ where: { status: "APPROVED" } }),
   ]);
 
-  const stats = {
-    totalUsers: users.length,
+  const typedTasks = tasks as TaskWithUser[];
+
+  const stats: AdminStats = {
+    totalUsers: typedUsers.length,
     totalTasks,
     pendingTasks,
     approvedTasks,
@@ -122,7 +126,7 @@ export default async function AdminDashboardPage() {
               <CardTitle>Recent Submissions</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {tasks.length === 0 ? (
+              {typedTasks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <p className="text-sm text-gray-500">No submissions yet</p>
                 </div>
@@ -146,7 +150,7 @@ export default async function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {tasks.map((task) => (
+                      {typedTasks.map((task: TaskWithUser) => (
                         <tr key={task.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm font-medium text-gray-900">
                             {task.title}
@@ -198,7 +202,7 @@ export default async function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {users.map((user) => (
+                  {typedUsers.map((user: UserWithTaskCount) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
                         {user.name || "N/A"}

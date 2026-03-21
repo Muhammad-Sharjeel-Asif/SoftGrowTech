@@ -56,7 +56,7 @@ export default function TaskActions({
 
   if (currentStatus === "APPROVED") {
     return (
-      <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-2.5 py-0.5 text-xs font-medium text-green-700">
+      <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-2.5 py-0.5 text-xs font-medium text-green-700 shadow-sm">
         Approved
       </span>
     );
@@ -64,7 +64,7 @@ export default function TaskActions({
 
   if (currentStatus === "REJECTED") {
     return (
-      <span className="inline-flex items-center rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 text-xs font-medium text-red-700">
+      <span className="inline-flex items-center rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 text-xs font-medium text-red-700 shadow-sm">
         Rejected
       </span>
     );

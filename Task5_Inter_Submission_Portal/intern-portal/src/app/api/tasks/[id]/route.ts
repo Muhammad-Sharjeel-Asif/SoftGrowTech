@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { updateTaskSchema, idParamSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
+import { Task, TaskWithUser, ApiResponse } from "@/types";
 
 export async function GET(
   req: NextRequest,
@@ -58,7 +59,7 @@ export async function GET(
       return apiError("Forbidden", 403);
     }
 
-    return apiSuccess({ task });
+    return apiSuccess<{ task: TaskWithUser }>({ task });
   } catch (error) {
     console.error("Fetch task error:", error);
     if (error instanceof Error && error.message === "Request timeout") {
@@ -156,10 +157,7 @@ export async function PATCH(
       DB_QUERY_TIMEOUT_MS
     );
 
-    return apiSuccess({
-      message: "Task updated successfully",
-      task,
-    });
+    return apiSuccess<TaskWithUser>(task);
   } catch (error) {
     console.error("Update task error:", error);
     if (error instanceof Error && error.message === "Request timeout") {

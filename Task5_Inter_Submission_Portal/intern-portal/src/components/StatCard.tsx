@@ -1,8 +1,4 @@
-interface StatCardProps {
-  label: string;
-  value: number | string;
-  color?: "blue" | "green" | "yellow" | "red" | "purple";
-}
+import { StatCardProps } from "@/types";
 
 export default function StatCard({
   label,

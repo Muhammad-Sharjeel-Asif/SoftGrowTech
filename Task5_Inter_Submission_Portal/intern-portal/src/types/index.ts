@@ -1,12 +1,17 @@
-// User types
+// ============================================
+// User Types
+// ============================================
+
 export interface User {
   id: string;
   name: string | null;
   email: string;
-  role: "INTERN" | "ADMIN";
+  role: UserRole;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
+
+export type UserRole = "INTERN" | "ADMIN";
 
 export interface UserWithTasks extends User {
   tasks: Task[];
@@ -18,17 +23,29 @@ export interface UserWithTaskCount extends User {
   };
 }
 
-// Task types
+export interface SessionUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: string;
+}
+
+// ============================================
+// Task Types
+// ============================================
+
+export type TaskStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export interface Task {
   id: string;
   title: string;
   description: string | null;
   fileUrl: string | null;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: TaskStatus;
   feedback: string | null;
   userId: string;
   createdAt: Date;
-  updatedAt?: Date; // Optional as it's not always selected
+  updatedAt?: Date;
 }
 
 export interface TaskWithUser extends Task {
@@ -39,69 +56,16 @@ export interface TaskWithUser extends Task {
   };
 }
 
-// Session types
-export interface SessionUser {
-  id: string;
-  email: string;
-  name?: string | null;
-  role: string;
-}
-
-// API Response types
-export interface ApiResponse<T> {
-  message?: string;
-  data?: T;
-  error?: string;
-  details?: Record<string, unknown>;
-}
-
-// Form types
 export interface TaskFormData {
   title: string;
   description?: string;
   fileUrl?: string;
 }
 
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
+// ============================================
+// Dashboard Types
+// ============================================
 
-export interface RegisterFormData {
-  name?: string;
-  email: string;
-  password: string;
-}
-
-// Component props types
-export interface TaskActionsProps {
-  taskId: string;
-  currentStatus: string;
-  currentFeedback: string | null;
-  onStatusChange: () => void;
-}
-
-export interface StatusBadgeProps {
-  status: string;
-}
-
-export interface StatCardProps {
-  label: string;
-  value: number | string;
-  icon?: string;
-  color?: "blue" | "green" | "yellow" | "red" | "purple";
-  trend?: {
-    value: number;
-    label: string;
-  };
-}
-
-export interface CardProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-// Dashboard types
 export interface DashboardStats {
   total: number;
   pending: number;
@@ -115,3 +79,83 @@ export interface AdminStats {
   pendingTasks: number;
   approvedTasks: number;
 }
+
+// ============================================
+// API Response Types
+// ============================================
+
+export interface ApiResponse<T = unknown> {
+  message?: string;
+  data?: T;
+  error?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface TasksResponse {
+  tasks: Task[] | TaskWithUser[];
+}
+
+export interface TaskResponse {
+  task: Task | TaskWithUser;
+}
+
+export interface UploadResponse {
+  message: string;
+  url: string;
+  publicId: string;
+  fileType?: string;
+  fileSize?: number;
+}
+
+export interface AuthResponse {
+  message: string;
+  user: Omit<User, "password">;
+}
+
+// ============================================
+// Component Props Types
+// ============================================
+
+export interface StatusBadgeProps {
+  status: string;
+}
+
+export interface TaskActionsProps {
+  taskId: string;
+  currentStatus: string;
+  currentFeedback: string | null;
+  onStatusChange: () => void;
+}
+
+export interface StatCardProps {
+  label: string;
+  value: number | string;
+  color?: "blue" | "green" | "yellow" | "red" | "purple";
+}
+
+export interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+// ============================================
+// Form Types
+// ============================================
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterFormData {
+  name?: string;
+  email: string;
+  password: string;
+}
+
+// ============================================
+// Utility Types
+// ============================================
+
+export type Nullable<T> = T | null;
+export type Optional<T> = T | undefined;

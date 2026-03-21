@@ -1,7 +1,4 @@
-export interface CardProps {
-  children: React.ReactNode;
-  className?: string;
-}
+import { CardProps } from "@/types";
 
 export function Card({ children, className = "" }: CardProps) {
   return (

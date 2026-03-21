@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { registerSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { SALT_ROUNDS } from "@/lib/constants";
+import { User, AuthResponse } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     // Return user without password
     const { password: _, ...userWithoutPassword } = user;
 
-    return apiSuccess(
+    return apiSuccess<{ message: string; user: typeof userWithoutPassword }>(
       {
         message: "User created successfully",
         user: userWithoutPassword,

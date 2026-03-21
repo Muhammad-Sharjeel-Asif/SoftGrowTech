@@ -11,6 +11,7 @@ import {
   ALLOWED_FILE_TYPES,
 } from "@/lib/constants";
 import { withTimeout, UPLOAD_TIMEOUT_MS } from "@/lib/timeout";
+import { UploadResponse } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Upload to Cloudinary with timeout
-    let result;
+    let result: { secure_url: string; public_id: string };
     try {
       result = await withTimeout(
         new Promise((resolve, reject) => {
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
               buffer.fill(0);
 
               if (error) reject(error);
-              else resolve(result);
+              else resolve(result as { secure_url: string; public_id: string });
             }
           );
 
@@ -130,10 +131,10 @@ export async function POST(req: NextRequest) {
       return apiError("Failed to upload file. Please try again.", 500);
     }
 
-    return apiSuccess({
+    return apiSuccess<UploadResponse>({
       message: "File uploaded successfully",
-      url: (result as { secure_url: string }).secure_url,
-      publicId: (result as { public_id: string }).public_id,
+      url: result.secure_url,
+      publicId: result.public_id,
       fileType: detectedType.mime,
       fileSize: file.size,
     });

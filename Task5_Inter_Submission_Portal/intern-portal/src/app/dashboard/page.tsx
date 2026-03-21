@@ -7,7 +7,7 @@ import TaskActionsWrapper from "@/components/TaskActionsWrapper";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
-import { Task, DashboardStats } from "@/types";
+import { Task, TaskWithUser, DashboardStats, UserWithTasks } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -46,8 +46,10 @@ export default async function DashboardPage({
     redirect("/login");
   }
 
-  const isAdmin = user.role === "ADMIN";
-  let allTasks = user.tasks;
+  const typedUser = user as UserWithTasks;
+  const isAdmin = typedUser.role === "ADMIN";
+  
+  let allTasks: TaskWithUser[] = [];
 
   if (isAdmin) {
     allTasks = await prisma.task.findMany({
@@ -61,18 +63,18 @@ export default async function DashboardPage({
         },
       },
       orderBy: { createdAt: "desc" },
-    }) as any; // Type assertion for admin tasks with user relation
+    }) as TaskWithUser[];
   }
 
   // Database-level aggregation for better performance
   const statsData = await prisma.task.groupBy({
     by: ["status"],
-    where: { userId: user.id },
+    where: { userId: typedUser.id },
     _count: true,
   });
 
-  const stats = {
-    total: user.tasks.length,
+  const stats: DashboardStats = {
+    total: typedUser.tasks.length,
     pending: statsData.find((s) => s.status === "PENDING")?._count || 0,
     approved: statsData.find((s) => s.status === "APPROVED")?._count || 0,
     rejected: statsData.find((s) => s.status === "REJECTED")?._count || 0,
@@ -87,16 +89,16 @@ export default async function DashboardPage({
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="mt-1 text-sm text-gray-600">
-                Welcome back, {user.name || user.email}
+                Welcome back, {typedUser.name || typedUser.email}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium text-gray-900">
-                  {user.name || "User"}
+                  {typedUser.name || "User"}
                 </p>
                 <p className="mt-1">
-                  <StatusBadge status={user.role} />
+                  <StatusBadge status={typedUser.role} />
                 </p>
               </div>
               <LogoutButton />
@@ -136,7 +138,7 @@ export default async function DashboardPage({
         {isAdmin ? (
           <AdminDashboard tasks={allTasks} />
         ) : (
-          <InternDashboard tasks={user.tasks} />
+          <InternDashboard tasks={typedUser.tasks} />
         )}
       </div>
     </div>
@@ -192,7 +194,7 @@ function InternDashboard({ tasks }: { tasks: Task[] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {tasks.map((task) => (
+                {tasks.map((task: Task) => (
                   <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {task.title}
@@ -235,21 +237,7 @@ function InternDashboard({ tasks }: { tasks: Task[] }) {
   );
 }
 
-function AdminDashboard({ tasks }: { tasks: {
-    id: string;
-    title: string;
-    description: string | null;
-    fileUrl: string | null;
-    status: string;
-    feedback: string | null;
-    userId: string;
-    createdAt: Date;
-    user?: {
-      id: string;
-      name: string | null;
-      email: string;
-    };
-  }[] }) {
+function AdminDashboard({ tasks }: { tasks: TaskWithUser[] }) {
   return (
     <Card>
       <CardHeader>
@@ -289,7 +277,7 @@ function AdminDashboard({ tasks }: { tasks: {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {tasks.map((task) => (
+                {tasks.map((task: TaskWithUser) => (
                   <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {task.title}
@@ -323,7 +311,7 @@ function AdminDashboard({ tasks }: { tasks: {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {task.feedback ? (
-                        <span className="italic max-w-xs truncate block">{task.feedback}</span>
+                        <span className="italic">{task.feedback}</span>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
