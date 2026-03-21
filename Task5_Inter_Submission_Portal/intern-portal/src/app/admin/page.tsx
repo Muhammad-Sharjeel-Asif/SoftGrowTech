@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import StatusBadge from "@/components/StatusBadge";
 import { UserWithTaskCount, TaskWithUser, AdminStats } from "@/types";
 import type { Metadata } from "next";
+import { User } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",

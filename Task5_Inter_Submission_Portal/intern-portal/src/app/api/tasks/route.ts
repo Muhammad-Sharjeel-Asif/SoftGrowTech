@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { createTaskSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
-import { Task, ApiResponse, TasksResponse } from "@/types";
+import { Task } from "@/types";
+import { User } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,8 +16,8 @@ export async function GET(req: NextRequest) {
       return apiError("Unauthorized", 401);
     }
 
-    // Get user to check role
-    const user = await withTimeout(
+    // Get user to check role - explicitly typed
+    const user: User | null = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return apiSuccess<{ tasks: Task[] | (Task & { user: { id: string; name: string | null; email: string } })[] }>({ tasks });
+    return apiSuccess<{ tasks: typeof tasks }>({ tasks });
   } catch (error) {
     console.error("Fetch tasks error:", error);
     if (error instanceof Error && error.message === "Request timeout") {
@@ -110,7 +111,7 @@ export async function POST(req: NextRequest) {
       DB_QUERY_TIMEOUT_MS
     );
 
-    return apiSuccess<{ task: Task }>({ task });
+    return apiSuccess<{ task: typeof task }>({ task });
   } catch (error) {
     console.error("Task submission error:", error);
     if (error instanceof Error && error.message === "Request timeout") {

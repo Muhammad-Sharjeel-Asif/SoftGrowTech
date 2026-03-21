@@ -12,6 +12,7 @@ import {
 } from "@/lib/constants";
 import { withTimeout, UPLOAD_TIMEOUT_MS } from "@/lib/timeout";
 import { UploadResponse } from "@/types";
+import { User } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,18 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.id) {
       return apiError("Unauthorized", 401);
+    }
+
+    // Get user - explicitly typed
+    const user: User | null = await withTimeout(
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+      }),
+      UPLOAD_TIMEOUT_MS
+    );
+
+    if (!user) {
+      return apiError("User not found", 404);
     }
 
     // Check file upload limit per user
