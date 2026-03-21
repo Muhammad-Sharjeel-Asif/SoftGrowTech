@@ -9,7 +9,6 @@ import StatCard from "@/components/StatCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { Task, TaskWithUser, DashboardStats, UserWithTasks } from "@/types";
 import type { Metadata } from "next";
-import { User } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Dashboard",
