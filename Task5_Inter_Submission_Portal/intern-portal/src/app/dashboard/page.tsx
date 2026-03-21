@@ -79,9 +79,9 @@ export default async function DashboardPage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-12">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
@@ -95,7 +95,7 @@ export default async function DashboardPage({
                 <p className="text-sm font-medium text-gray-900">
                   {user.name || "User"}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="mt-1">
                   <StatusBadge status={user.role} />
                 </p>
               </div>
@@ -108,13 +108,10 @@ export default async function DashboardPage({
       {/* Error Alert */}
       {error === "unauthorized" && (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-            <div className="flex items-center gap-3">
-              <span className="text-xl">⚠️</span>
-              <p className="text-sm text-red-800">
-                You don&apos;t have permission to access that page.
-              </p>
-            </div>
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
+            <p className="text-sm text-red-800">
+              You don&apos;t have permission to access that page.
+            </p>
           </div>
         </div>
       )}
@@ -123,12 +120,17 @@ export default async function DashboardPage({
         {/* Stats Grid - For Interns */}
         {!isAdmin && (
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Total Tasks" value={stats.total} icon="📋" color="blue" />
-            <StatCard label="Pending" value={stats.pending} icon="⏳" color="yellow" />
-            <StatCard label="Approved" value={stats.approved} icon="✓" color="green" />
-            <StatCard label="Rejected" value={stats.rejected} icon="✗" color="red" />
+            <StatCard label="Total Tasks" value={stats.total} color="blue" />
+            <StatCard label="Pending" value={stats.pending} color="yellow" />
+            <StatCard label="Approved" value={stats.approved} color="green" />
+            <StatCard label="Rejected" value={stats.rejected} color="red" />
           </div>
         )}
+
+        {/* Section Separator */}
+        <div className="mb-6">
+          <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        </div>
 
         {/* Main Content */}
         {isAdmin ? (
@@ -156,7 +158,6 @@ function InternDashboard({ tasks }: { tasks: Task[] }) {
       <CardContent className="p-0">
         {tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 text-6xl">📝</div>
             <h3 className="text-lg font-medium text-gray-900">No tasks yet</h3>
             <p className="mt-2 text-sm text-gray-600">
               Submit your first task to get started!
@@ -202,9 +203,9 @@ function InternDashboard({ tasks }: { tasks: Task[] }) {
                           href={task.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                          <span>📎</span> View
+                          View
                         </a>
                       ) : (
                         <span className="text-gray-400">—</span>
@@ -257,7 +258,6 @@ function AdminDashboard({ tasks }: { tasks: {
       <CardContent className="p-0">
         {tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 text-6xl">📊</div>
             <h3 className="text-lg font-medium text-gray-900">No submissions yet</h3>
             <p className="mt-2 text-sm text-gray-600">
               Tasks submitted by interns will appear here.
@@ -306,9 +306,9 @@ function AdminDashboard({ tasks }: { tasks: {
                           href={task.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                          <span>📎</span> View
+                          View
                         </a>
                       ) : (
                         <span className="text-gray-400">—</span>

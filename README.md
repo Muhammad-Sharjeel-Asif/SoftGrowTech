@@ -9,6 +9,7 @@ This repository contains a collection of web development projects showcasing var
 - [Project 2: To-Do List Application](#project-2-todo-list-application)
 - [Project 3: Resume Portfolio Website](#project-3-resume-portfolio-website)
 - [Project 4: Responsive E-commerce Landing Page](#project-4-responsive-e-commerce-landing-page)
+- [Project 5: Intern Submission Portal](#project-5-intern-submission-portal)
 - [Technologies Used](#technologies-used)
 - [Project Setup](#project-setup)
 - [Features Overview](#features-overview)
@@ -16,7 +17,7 @@ This repository contains a collection of web development projects showcasing var
 
 ## Overview
 
-The SoftGrowTech repository is a compilation of four distinct web development projects that demonstrate various aspects of front-end development. These projects range from a music player application, a simple productivity application, a professional portfolio, and a modern e-commerce landing page, each showcasing different web development skills and techniques.
+The SoftGrowTech repository is a compilation of five distinct web development projects that demonstrate various aspects of front-end and full-stack development. These projects range from a music player application, a simple productivity application, a professional portfolio, a modern e-commerce landing page, and a full-stack intern submission portal, each showcasing different web development skills and techniques.
 
 ## Project 1: Web Music Player
 
@@ -175,27 +176,88 @@ Task4_Responsive_Landing_Page/
 ### Design Philosophy
 The landing page follows e-commerce best practices with a focus on conversion optimization. The design emphasizes key selling points, provides clear value propositions, and features prominent calls-to-action. The color scheme and typography are chosen to create trust and encourage user engagement.
 
+## Project 5: Intern Submission Portal
+
+### Description
+A full-stack Intern Submission Portal built with Next.js, TypeScript, and PostgreSQL. This application provides a comprehensive platform for interns to submit their work, track progress, and manage assignments with authentication and file upload capabilities.
+
+### Features
+- **User Authentication**: Secure login and registration system with NextAuth
+- **File Submissions**: Upload and manage submission files with Cloudinary integration
+- **Dashboard**: Personalized dashboard for interns to track their assignments
+- **Admin Panel**: Administrative interface for managing interns and submissions
+- **Database Integration**: PostgreSQL database with Prisma ORM for data management
+- **Form Validation**: Server-side validation using Zod schema
+- **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
+
+### Technologies Used
+- **Next.js 16**: React framework with App Router and server components
+- **TypeScript**: Type-safe development with full TypeScript support
+- **Prisma**: Database ORM with PostgreSQL adapter
+- **NextAuth**: Authentication system for secure user access
+- **Cloudinary**: Cloud-based file storage and management
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **Zod**: Schema validation for forms and API endpoints
+- **React Hot Toast**: Toast notifications for user feedback
+
+### File Structure
+```
+Task5_Inter_Submission_Portal/intern-portal/
+├── src/
+│   ├── app/              # Next.js App Router pages
+│   ├── components/       # Reusable React components
+│   ├── lib/              # Utility functions and configurations
+│   └── utils/            # Helper utilities
+├── prisma/
+│   └── schema.prisma     # Database schema definition
+├── public/               # Static assets
+├── package.json          # Project dependencies
+└── next.config.ts        # Next.js configuration
+```
+
+### Key Implementation Details
+- **Authentication**: NextAuth integration with secure session management
+- **Database**: PostgreSQL with Prisma ORM for type-safe database access
+- **File Upload**: Cloudinary integration for secure file storage
+- **Server Components**: Next.js server components for optimal performance
+- **API Routes**: RESTful API endpoints for data operations
+- **Type Safety**: Full TypeScript coverage across the codebase
+
+### Design Philosophy
+The Intern Submission Portal follows modern full-stack development practices with a focus on security, scalability, and user experience. The clean, professional interface prioritizes functionality while maintaining an intuitive user flow for both interns and administrators.
+
 ## Technologies Used Across All Projects
 
-### Common Technologies
+### Front-End Technologies
 - **HTML5**: Modern semantic markup across all projects
 - **CSS3**: Advanced styling with flexbox, grid, animations, and responsive design
 - **Vanilla JavaScript**: Client-side functionality without external dependencies
-- **Responsive Design**: Mobile-first approach with adaptive layouts
-- **Local Storage**: Client-side data persistence for task management
+- **React 19**: Component-based UI library for modern web applications
+- **Next.js 16**: React framework with server-side rendering and App Router
+- **TypeScript**: Type-safe JavaScript development
+- **Tailwind CSS**: Utility-first CSS framework
+
+### Back-End Technologies
+- **Node.js**: JavaScript runtime for server-side development
+- **Next.js API Routes**: Serverless API endpoints
+- **Prisma ORM**: Type-safe database ORM
+- **PostgreSQL**: Relational database management
 
 ### Development Tools & Practices
 - **Git Version Control**: Proper project organization and history tracking
 - **Cross-Browser Compatibility**: Consistent behavior across modern browsers
 - **Accessibility Standards**: Semantic HTML and proper ARIA attributes
 - **Performance Optimization**: Efficient code and optimized assets
-- **Modern CSS Features**: CSS variables, flexbox, grid, and animations
+- **Authentication**: NextAuth for secure user authentication
+- **Cloud Storage**: Cloudinary for file management
 
 ## Project Setup
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - Text editor or IDE (VS Code, Sublime Text, etc.)
+- Node.js (v18 or higher) for the Intern Submission Portal
+- PostgreSQL database for the Intern Submission Portal
 
 ### Installation
 1. Clone the repository:
@@ -213,11 +275,22 @@ The landing page follows e-commerce best practices with a focus on conversion op
    - For To-Do List: `cd Task2_To-Do_List_App/`
    - For Resume Website: `cd Task3_Resume_Website_Project/`
    - For Landing Page: `cd Task4_Responsive_Landing_Page/`
+   - For Intern Submission Portal: `cd Task5_Inter_Submission_Portal/intern-portal/`
 
 4. Open the `index.html` file in your preferred browser, or serve via a local development server for better functionality (especially for the Resume Website which has path issues in the HTML file).
 
 ### Running the Projects
-Each project is self-contained and can be run directly by opening the `index.html` file in a web browser. For the most accurate experience, particularly with the Resume Website project (which references CSS and JS files with incorrect paths in the current HTML), you may want to temporarily update the file paths in `Task3_Resume_Website_Project/index.html` from `css/style.css`, `js/script.js` to `style.css`, `script.js` respectively, or serve the files through a local web server.
+
+**Front-End Projects (1-4):**
+Each front-end project is self-contained and can be run directly by opening the `index.html` file in a web browser. For the most accurate experience, particularly with the Resume Website project (which references CSS and JS files with incorrect paths in the current HTML), you may want to temporarily update the file paths in `Task3_Resume_Website_Project/index.html` from `css/style.css`, `js/script.js` to `style.css`, `script.js` respectively, or serve the files through a local web server.
+
+**Intern Submission Portal (Project 5):**
+```bash
+cd Task5_Inter_Submission_Portal/intern-portal/
+npm install
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Local Development Server Options
 - Python: `python -m http.server 8000` (Python 3) or `python -m SimpleHTTPServer 8000` (Python 2)
@@ -227,18 +300,20 @@ Each project is self-contained and can be run directly by opening the `index.htm
 
 ## Features Overview
 
-| Feature | Web Music Player | To-Do List App | Resume Website | Landing Page |
-|---------|-----------------|----------------|----------------|--------------|
-| Responsive Design | Yes | Yes | Yes | Yes |
-| Audio Playback | Yes | No | No | No |
-| Local Storage | No | Yes | No | No |
-| Theme Switching | No | No | Yes | No |
-| Interactive UI | Yes | Yes | Yes | Yes |
-| Mobile Navigation | No | No | Yes | Yes |
-| SVG Graphics | No | No | No | Yes |
-| Social Integration | No | No | Yes | Yes |
-| Data Visualization | No | No | Yes | No |
-| Accessibility | Yes | Yes | Yes | Yes |
+| Feature | Web Music Player | To-Do List App | Resume Website | Landing Page | Intern Submission Portal |
+|---------|-----------------|----------------|----------------|--------------|-------------------------|
+| Responsive Design | Yes | Yes | Yes | Yes | Yes |
+| Audio Playback | Yes | No | No | No | No |
+| Local Storage | No | Yes | No | No | No |
+| Theme Switching | No | No | Yes | No | No |
+| Interactive UI | Yes | Yes | Yes | Yes | Yes |
+| Mobile Navigation | No | No | Yes | Yes | Yes |
+| Authentication | No | No | No | No | Yes |
+| Database Integration | No | No | No | No | Yes |
+| File Upload | No | No | No | No | Yes |
+| Server-Side Rendering | No | No | No | No | Yes |
+| TypeScript | No | No | No | No | Yes |
+| Accessibility | Yes | Yes | Yes | Yes | Yes |
 
 ## Development Approach
 
@@ -269,6 +344,7 @@ Each project follows a user-centered design approach with emphasis on:
 
 These projects were designed to demonstrate:
 - **Front-End Development Skills**: HTML, CSS, and JavaScript proficiency
+- **Full-Stack Development**: Next.js, TypeScript, PostgreSQL, and API development
 - **Responsive Design Principles**: Mobile-first development approach
 - **Modern Web Standards**: Implementation of current best practices
 - **User Experience Focus**: Intuitive and accessible interfaces

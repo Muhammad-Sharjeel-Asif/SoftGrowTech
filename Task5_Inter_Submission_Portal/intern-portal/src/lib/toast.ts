@@ -1,108 +1,89 @@
-import toast, { Toast, Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+
+// Re-export Toaster component
+export { Toaster };
 
 // Toast configuration
 const toastConfig = {
   duration: 4000,
   position: "top-right" as const,
-  style: {
-    borderRadius: "8px",
-    background: "#333",
-    color: "#fff",
-    fontSize: "14px",
-    fontWeight: 500,
-    padding: "12px 16px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-  },
   success: {
     duration: 3000,
-    iconTheme: {
-      primary: "#10B981",
-      secondary: "#fff",
-    },
-    style: {
-      background: "#ECFDF5",
-      color: "#065F46",
-      border: "1px solid #10B981",
-    },
   },
   error: {
     duration: 5000,
-    iconTheme: {
-      primary: "#EF4444",
-      secondary: "#fff",
-    },
-    style: {
-      background: "#FEF2F2",
-      color: "#991B1B",
-      border: "1px solid #EF4444",
-    },
   },
   loading: {
     duration: 10000,
-    style: {
-      background: "#EFF6FF",
-      color: "#1E40AF",
-      border: "1px solid #3B82F6",
-    },
   },
 };
-
-// Custom toast components
-const ToastContent = ({
-  icon,
-  message,
-}: {
-  icon: string;
-  message: string;
-}) => (
-  <div className="flex items-center gap-2">
-    <span className="text-lg" role="img" aria-hidden="true">
-      {icon}
-    </span>
-    <span className="font-medium">{message}</span>
-  </div>
-);
 
 // Success toast
 export const showToast = {
   success: (message: string) => {
-    return toast.success(<ToastContent icon="✓" message={message} />, {
+    return toast.success(message, {
       ...toastConfig,
       ...toastConfig.success,
+      icon: "✓",
+      style: {
+        background: "#ECFDF5",
+        color: "#065F46",
+        border: "1px solid #10B981",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: 500,
+      },
     });
   },
 
   // Error toast
   error: (message: string) => {
-    return toast.error(<ToastContent icon="✗" message={message} />, {
+    return toast.error(message, {
       ...toastConfig,
       ...toastConfig.error,
+      icon: "✗",
+      style: {
+        background: "#FEF2F2",
+        color: "#991B1B",
+        border: "1px solid #EF4444",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: 500,
+      },
     });
   },
 
   // Loading toast (returns dismiss function)
   loading: (message: string) => {
-    return toast.loading(<ToastContent icon="⏳" message={message} />, {
+    return toast.loading(message, {
       ...toastConfig,
       ...toastConfig.loading,
+      icon: "⏳",
+      style: {
+        background: "#EFF6FF",
+        color: "#1E40AF",
+        border: "1px solid #3B82F6",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: 500,
+      },
     });
   },
 
   // Info toast
   info: (message: string) => {
-    return toast(
-      <ToastContent icon="ℹ" message={message} />,
-      {
-        ...toastConfig,
-        duration: 4000,
-        style: {
-          ...toastConfig.success.style,
-          background: "#EFF6FF",
-          color: "#1E40AF",
-          border: "1px solid #3B82F6",
-        },
-      }
-    );
+    return toast(message, {
+      ...toastConfig,
+      icon: "ℹ",
+      style: {
+        background: "#EFF6FF",
+        color: "#1E40AF",
+        border: "1px solid #3B82F6",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: 500,
+      },
+    });
   },
 
   // Promise helper
@@ -120,9 +101,36 @@ export const showToast = {
       error: messages.error,
     }, {
       ...toastConfig,
-      success: toastConfig.success,
-      error: toastConfig.error,
-      loading: toastConfig.loading,
+      success: {
+        ...toastConfig.success,
+        icon: "✓",
+        style: {
+          background: "#ECFDF5",
+          color: "#065F46",
+          border: "1px solid #10B981",
+          borderRadius: "8px",
+        },
+      },
+      error: {
+        ...toastConfig.error,
+        icon: "✗",
+        style: {
+          background: "#FEF2F2",
+          color: "#991B1B",
+          border: "1px solid #EF4444",
+          borderRadius: "8px",
+        },
+      },
+      loading: {
+        ...toastConfig.loading,
+        icon: "⏳",
+        style: {
+          background: "#EFF6FF",
+          color: "#1E40AF",
+          border: "1px solid #3B82F6",
+          borderRadius: "8px",
+        },
+      },
     });
   },
 
@@ -132,6 +140,4 @@ export const showToast = {
   },
 };
 
-// Export Toaster component
-export { Toaster };
 export default toast;

@@ -91,9 +91,9 @@ export default function SubmitTaskPage() {
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900"
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
-            <span>←</span> Back to Dashboard
+            ← Back to Dashboard
           </Link>
         </div>
       </div>
@@ -101,16 +101,11 @@ export default function SubmitTaskPage() {
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-xl">
-                📝
-              </div>
-              <div>
-                <CardTitle>Submit Task</CardTitle>
-                <p className="mt-1 text-sm text-gray-600">
-                  Fill in the details below to submit your task for review
-                </p>
-              </div>
+            <div>
+              <CardTitle>Submit Task</CardTitle>
+              <p className="mt-1 text-sm text-gray-600">
+                Fill in the details below to submit your task for review
+              </p>
             </div>
           </CardHeader>
 
@@ -179,11 +174,10 @@ export default function SubmitTaskPage() {
                     className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
                   />
                   <p className="mt-2 text-xs text-gray-500">
-                    📎 Allowed: PDF, Images, ZIP, DOC. Max size: 10MB
+                    Allowed: PDF, Images, ZIP, DOC. Max size: 10MB
                   </p>
                   {file && (
                     <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
-                      <span className="text-lg">📄</span>
                       <span className="text-sm text-gray-600">
                         {file.name}
                       </span>

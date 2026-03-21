@@ -75,30 +75,25 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-12">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-xl">
-                  👑
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Manage users and review submissions
-                  </p>
-                </div>
-              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="mt-1 text-sm text-gray-600">
+                Manage users and review submissions
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium text-gray-900">
                   {session.user.name || "Admin"}
                 </p>
-                <StatusBadge status="ADMIN" />
+                <div className="mt-1">
+                  <StatusBadge status="ADMIN" />
+                </div>
               </div>
               <LogoutButton />
             </div>
@@ -109,10 +104,15 @@ export default async function AdminDashboardPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Stats Grid */}
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Total Users" value={stats.totalUsers} icon="👥" color="blue" />
-          <StatCard label="Total Tasks" value={stats.totalTasks} icon="📋" color="purple" />
-          <StatCard label="Pending Review" value={stats.pendingTasks} icon="⏳" color="yellow" />
-          <StatCard label="Approved" value={stats.approvedTasks} icon="✓" color="green" />
+          <StatCard label="Total Users" value={stats.totalUsers} color="blue" />
+          <StatCard label="Total Tasks" value={stats.totalTasks} color="purple" />
+          <StatCard label="Pending Review" value={stats.pendingTasks} color="yellow" />
+          <StatCard label="Approved" value={stats.approvedTasks} color="green" />
+        </div>
+
+        {/* Section Separator */}
+        <div className="mb-6">
+          <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
         </div>
 
         {/* Recent Tasks */}

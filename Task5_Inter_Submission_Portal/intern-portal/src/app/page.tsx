@@ -1,35 +1,34 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "Intern Task Portal - Submit and review tasks",
+};
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Hero Section */}
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
-          {/* Icon */}
-          <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-blue-600 text-5xl shadow-xl">
-            📚
-          </div>
-
-          {/* Title */}
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
-            Intern Portal
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+            Intern Task Portal
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
             Streamline your internship journey. Submit tasks, track progress, and
-            get feedback from admins — all in one place.
+            get feedback from administrators.
           </p>
 
-          {/* CTA Buttons */}
           <div className="mt-10 flex items-center justify-center gap-4">
             {session ? (
               <Link
                 href="/dashboard"
-                className="rounded-xl bg-blue-600 px-8 py-3 text-base font-medium text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl"
+                className="rounded-lg bg-blue-600 px-8 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md"
               >
                 Go to Dashboard
               </Link>
@@ -37,13 +36,13 @@ export default async function HomePage() {
               <>
                 <Link
                   href="/register"
-                  className="rounded-xl bg-blue-600 px-8 py-3 text-base font-medium text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl"
+                  className="rounded-lg bg-blue-600 px-8 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md"
                 >
                   Get Started
                 </Link>
                 <Link
                   href="/login"
-                  className="rounded-xl border-2 border-gray-300 bg-white px-8 py-3 text-base font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
+                  className="rounded-lg border border-gray-300 bg-white px-8 py-3 text-base font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md"
                 >
                   Sign In
                 </Link>
@@ -53,36 +52,30 @@ export default async function HomePage() {
         </div>
 
         {/* Features Grid */}
-        <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
-            icon="📝"
             title="Submit Tasks"
             description="Easily submit your work with descriptions and file attachments for review."
           />
           <FeatureCard
-            icon="👀"
             title="Track Progress"
             description="Monitor the status of your submissions — Pending, Approved, or Rejected."
           />
           <FeatureCard
-            icon="💬"
             title="Get Feedback"
-            description="Receive detailed feedback from admins to improve your work."
+            description="Receive detailed feedback from administrators to improve your work."
           />
           <FeatureCard
-            icon="📁"
             title="File Uploads"
             description="Attach documents, code, or any relevant files to your submissions."
           />
           <FeatureCard
-            icon="🔒"
             title="Secure Access"
             description="Your data is protected with secure authentication and role-based access."
           />
           <FeatureCard
-            icon="📊"
             title="Admin Dashboard"
-            description="Admins can review all submissions and manage intern progress efficiently."
+            description="Administrators can review all submissions and manage intern progress."
           />
         </div>
       </div>
@@ -100,17 +93,14 @@ export default async function HomePage() {
 }
 
 function FeatureCard({
-  icon,
   title,
   description,
 }: {
-  icon: string;
   title: string;
   description: string;
 }) {
   return (
-    <div className="group rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition-all hover:border-blue-200 hover:shadow-md">
-      <div className="mb-4 text-4xl">{icon}</div>
+    <div className="group rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md">
       <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
         {title}
       </h3>

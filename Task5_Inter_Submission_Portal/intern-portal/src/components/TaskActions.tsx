@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TaskActionsProps } from "@/types";
 import { Button } from "@/components/Button";
+import { showToast } from "@/lib/toast";
 
 export default function TaskActions({
   taskId,
@@ -11,13 +12,11 @@ export default function TaskActions({
   onStatusChange,
 }: TaskActionsProps) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState(currentFeedback || "");
 
   async function updateTask(status: string) {
     setLoading(true);
-    setError("");
 
     try {
       const res = await fetch(`/api/tasks/${taskId}`, {
@@ -29,14 +28,15 @@ export default function TaskActions({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to update task");
+        showToast.error(data.error || "Failed to update task");
       } else {
+        showToast.success(`Task ${status.toLowerCase()}`);
         onStatusChange();
         setShowFeedback(false);
         setFeedback("");
       }
     } catch {
-      setError("Failed to update task");
+      showToast.error("Failed to update task");
     } finally {
       setLoading(false);
     }
@@ -54,33 +54,17 @@ export default function TaskActions({
     updateTask("REJECTED");
   }
 
-  // Already approved
   if (currentStatus === "APPROVED") {
     return (
-      <span
-        className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700"
-        role="status"
-        aria-label="Task approved"
-      >
-        <span role="img" aria-hidden="true">
-          ✓
-        </span>
+      <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-2.5 py-0.5 text-xs font-medium text-green-700">
         Approved
       </span>
     );
   }
 
-  // Already rejected
   if (currentStatus === "REJECTED") {
     return (
-      <span
-        className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
-        role="status"
-        aria-label="Task rejected"
-      >
-        <span role="img" aria-hidden="true">
-          ✗
-        </span>
+      <span className="inline-flex items-center rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 text-xs font-medium text-red-700">
         Rejected
       </span>
     );
@@ -88,12 +72,6 @@ export default function TaskActions({
 
   return (
     <div className="space-y-3">
-      {error && (
-        <p className="text-xs text-red-600" role="alert">
-          {error}
-        </p>
-      )}
-
       {showFeedback ? (
         <div className="space-y-3">
           <div>
@@ -101,7 +79,7 @@ export default function TaskActions({
               htmlFor={`feedback-${taskId}`}
               className="block text-xs font-medium text-gray-700"
             >
-              Feedback <span className="text-red-500">*</span>
+              Feedback
             </label>
             <textarea
               id={`feedback-${taskId}`}
@@ -110,7 +88,6 @@ export default function TaskActions({
               placeholder="Explain why this task needs improvement..."
               rows={3}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-              aria-required="true"
             />
           </div>
           <div className="flex gap-2">
@@ -120,7 +97,6 @@ export default function TaskActions({
               onClick={handleSubmitReject}
               disabled={loading || !feedback.trim()}
               isLoading={loading}
-              aria-label="Confirm reject task"
             >
               Confirm Reject
             </Button>
@@ -130,10 +106,8 @@ export default function TaskActions({
               onClick={() => {
                 setShowFeedback(false);
                 setFeedback("");
-                setError("");
               }}
               disabled={loading}
-              aria-label="Cancel rejection"
             >
               Cancel
             </Button>
@@ -147,11 +121,7 @@ export default function TaskActions({
             onClick={handleApprove}
             disabled={loading}
             isLoading={loading}
-            aria-label="Approve task"
           >
-            <span role="img" aria-hidden="true">
-              ✓
-            </span>
             Approve
           </Button>
           <Button
@@ -159,11 +129,7 @@ export default function TaskActions({
             size="sm"
             onClick={handleReject}
             disabled={loading}
-            aria-label="Reject task"
           >
-            <span role="img" aria-hidden="true">
-              ✗
-            </span>
             Reject
           </Button>
         </div>
