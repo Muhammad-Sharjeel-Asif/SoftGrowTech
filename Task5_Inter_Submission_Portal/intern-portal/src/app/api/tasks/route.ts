@@ -6,7 +6,6 @@ import { createTaskSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
 import { Task } from "@/types";
-import type { User } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +16,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user to check role
-    const user: User | null = await withTimeout(
+    const user = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),

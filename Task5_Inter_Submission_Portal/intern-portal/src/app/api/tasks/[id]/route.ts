@@ -6,7 +6,6 @@ import { updateTaskSchema, idParamSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
 import { Task, TaskWithUser } from "@/types";
-import type { User } from "@prisma/client";
 
 export async function GET(
   req: NextRequest,
@@ -23,7 +22,7 @@ export async function GET(
     const { id } = idParamSchema.parse(await params);
 
     // Get user to check role
-    const user: User | null = await withTimeout(
+    const user = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
@@ -85,7 +84,7 @@ export async function PATCH(
     const { id } = idParamSchema.parse(await params);
 
     // Get user to check role
-    const user: User | null = await withTimeout(
+    const user = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
