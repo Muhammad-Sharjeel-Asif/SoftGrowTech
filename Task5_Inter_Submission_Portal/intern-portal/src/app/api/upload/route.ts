@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check file upload limit per user
-    const userTasksWithFiles = await withTimeout(
+    const userTasksWithFiles: { id: string }[] = await withTimeout(
       prisma.task.findMany({
         where: { userId: session.user.id, fileUrl: { not: null } },
         select: { id: true },

@@ -5,6 +5,7 @@ import { registerSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { SALT_ROUNDS } from "@/lib/constants";
 import { User, AuthResponse } from "@/types";
+import type { User as PrismaUser } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
     const { name, email, password } = validation.data;
 
     // Check for existing user
-    const existingUser = await prisma.user.findUnique({
+    const existingUser: PrismaUser | null = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
 
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     // Create user
-    const user = await prisma.user.create({
+    const user: PrismaUser = await prisma.user.create({
       data: {
         name: name?.trim() || null,
         email: email.toLowerCase(),
