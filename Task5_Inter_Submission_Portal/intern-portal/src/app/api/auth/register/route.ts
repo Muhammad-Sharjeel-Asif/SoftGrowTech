@@ -32,11 +32,11 @@ export async function POST(req: NextRequest) {
     const { name, email, password } = validation.data;
 
     // Check for existing user
-    const existingUser = await prisma.user.findUnique({
+    const existingUserFromDb = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
 
-    if (existingUser) {
+    if (existingUserFromDb) {
       return apiError("User with this email already exists", 409);
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     // Create user
-    const user = await prisma.user.create({
+    const userFromDb = await prisma.user.create({
       data: {
         name: name?.trim() || null,
         email: email.toLowerCase(),
@@ -53,13 +53,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
+    // Map Prisma result to custom User type (without password)
+    const user: User = {
+      id: userFromDb.id,
+      email: userFromDb.email,
+      name: userFromDb.name,
+      role: userFromDb.role as "INTERN" | "ADMIN",
+    };
 
-    return apiSuccess<{ message: string; user: typeof userWithoutPassword }>(
+    return apiSuccess<AuthResponse>(
       {
         message: "User created successfully",
-        user: userWithoutPassword,
+        user,
       },
       201
     );

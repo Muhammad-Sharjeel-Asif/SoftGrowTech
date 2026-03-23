@@ -22,22 +22,24 @@ export async function GET(
     const { id } = idParamSchema.parse(await params);
 
     // Get user to check role
-    const userResult = await withTimeout(
+    const userFromDb = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
       DB_QUERY_TIMEOUT_MS
     );
 
-    if (!userResult) {
+    if (!userFromDb) {
       return apiError("User not found", 404);
     }
 
-    const user: User = userResult as User;
-
-    if (!("role" in user)) {
-      return apiError("Invalid user object", 500);
-    }
+    // Map Prisma result to custom User type
+    const user: User = {
+      id: userFromDb.id,
+      email: userFromDb.email,
+      name: userFromDb.name,
+      role: userFromDb.role as "INTERN" | "ADMIN",
+    };
 
     // Fetch task
     const task = await withTimeout(
@@ -90,22 +92,24 @@ export async function PATCH(
     const { id } = idParamSchema.parse(await params);
 
     // Get user to check role
-    const userResult = await withTimeout(
+    const userFromDb = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
       DB_QUERY_TIMEOUT_MS
     );
 
-    if (!userResult) {
+    if (!userFromDb) {
       return apiError("User not found", 404);
     }
 
-    const user: User = userResult as User;
-
-    if (!("role" in user)) {
-      return apiError("Invalid user object", 500);
-    }
+    // Map Prisma result to custom User type
+    const user: User = {
+      id: userFromDb.id,
+      email: userFromDb.email,
+      name: userFromDb.name,
+      role: userFromDb.role as "INTERN" | "ADMIN",
+    };
 
     // Admin-only endpoint for status updates
     if (user.role !== "ADMIN") {

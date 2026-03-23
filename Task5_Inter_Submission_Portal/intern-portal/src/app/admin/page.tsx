@@ -215,7 +215,7 @@ export default async function AdminDashboardPage() {
                         {user._count.tasks}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                       </td>
                     </tr>
                   ))}

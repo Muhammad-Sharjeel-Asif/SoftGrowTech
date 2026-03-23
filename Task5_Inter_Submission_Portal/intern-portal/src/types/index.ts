@@ -1,17 +1,22 @@
 // ============================================
+// Core Domain Types (Single Source of Truth)
+// ============================================
+
+export type UserRole = "INTERN" | "ADMIN";
+
+export type TaskStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+// ============================================
 // User Types
 // ============================================
 
 export interface User {
   id: string;
-  name: string | null;
   email: string;
+  name: string | null;
   role: UserRole;
-  createdAt: Date;
-  updatedAt?: Date;
+  createdAt?: Date;
 }
-
-export type UserRole = "INTERN" | "ADMIN";
 
 export interface UserWithTasks extends User {
   tasks: Task[];
@@ -23,18 +28,9 @@ export interface UserWithTaskCount extends User {
   };
 }
 
-export interface SessionUser {
-  id: string;
-  email: string;
-  name?: string | null;
-  role: string;
-}
-
 // ============================================
 // Task Types
 // ============================================
-
-export type TaskStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface Task {
   id: string;
@@ -45,7 +41,6 @@ export interface Task {
   feedback: string | null;
   userId: string;
   createdAt: Date;
-  updatedAt?: Date;
 }
 
 export interface TaskWithUser extends Task {
@@ -60,6 +55,17 @@ export interface TaskFormData {
   title: string;
   description?: string;
   fileUrl?: string;
+}
+
+// ============================================
+// Session Types (NextAuth)
+// ============================================
+
+export interface SessionUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: UserRole;
 }
 
 // ============================================

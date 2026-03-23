@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createTaskSchema } from "@/lib/schemas";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
 import { withTimeout, DB_QUERY_TIMEOUT_MS } from "@/lib/timeout";
-import { Task } from "@/types";
+import { Task, TaskWithUser, User } from "@/types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,22 +16,30 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user to check role
-    const user = await withTimeout(
+    const userFromDb = await withTimeout(
       prisma.user.findUnique({
         where: { id: session.user.id },
       }),
       DB_QUERY_TIMEOUT_MS
     );
 
-    if (!user) {
+    if (!userFromDb) {
       return apiError("User not found", 404);
     }
 
-    let tasks: Task[] | (Task & { user: { id: string; name: string | null; email: string } })[];
+    // Map Prisma result to custom User type
+    const user: User = {
+      id: userFromDb.id,
+      email: userFromDb.email,
+      name: userFromDb.name,
+      role: userFromDb.role as "INTERN" | "ADMIN",
+    };
+
+    let tasks: Task[] | TaskWithUser[];
 
     if (user.role === "ADMIN") {
       // Admin sees all tasks with user info
-      tasks = await withTimeout(
+      const tasksWithUser = await withTimeout(
         prisma.task.findMany({
           include: {
             user: {
@@ -46,6 +54,15 @@ export async function GET(req: NextRequest) {
         }),
         DB_QUERY_TIMEOUT_MS
       );
+      // Map to TaskWithUser type
+      tasks = tasksWithUser.map((t) => ({
+        ...t,
+        user: {
+          id: t.user.id,
+          name: t.user.name,
+          email: t.user.email,
+        },
+      })) as TaskWithUser[];
     } else {
       // Intern sees only their tasks
       tasks = await withTimeout(
@@ -54,7 +71,7 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "desc" },
         }),
         DB_QUERY_TIMEOUT_MS
-      );
+      ) as Task[];
     }
 
     return apiSuccess<{ tasks: typeof tasks }>({ tasks });
