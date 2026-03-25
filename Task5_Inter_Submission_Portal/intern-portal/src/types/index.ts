@@ -1,6 +1,9 @@
 // ============================================
 // Core Domain Types (Single Source of Truth)
 // ============================================
+// These types are the authoritative definitions for all domain entities.
+// NEVER import from @prisma/client in UI or API layers.
+// Always map database results to these types.
 
 export type UserRole = "INTERN" | "ADMIN";
 
@@ -15,17 +18,32 @@ export interface User {
   email: string;
   name: string | null;
   role: UserRole;
-  createdAt?: Date;
+  createdAt: Date | null;
 }
 
+/**
+ * User with their tasks - for dashboard views
+ */
 export interface UserWithTasks extends User {
   tasks: Task[];
 }
 
+/**
+ * User with task count - for admin user list
+ */
 export interface UserWithTaskCount extends User {
   _count: {
     tasks: number;
   };
+}
+
+/**
+ * Minimal user info for nested relations (without sensitive data)
+ */
+export interface UserInfo {
+  id: string;
+  name: string | null;
+  email: string;
 }
 
 // ============================================
@@ -43,12 +61,11 @@ export interface Task {
   createdAt: Date;
 }
 
+/**
+ * Task with full user information
+ */
 export interface TaskWithUser extends Task {
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-  };
+  user: UserInfo;
 }
 
 export interface TaskFormData {
@@ -64,7 +81,7 @@ export interface TaskFormData {
 export interface SessionUser {
   id: string;
   email: string;
-  name?: string | null;
+  name: string | null;
   role: UserRole;
 }
 
@@ -115,7 +132,7 @@ export interface UploadResponse {
 
 export interface AuthResponse {
   message: string;
-  user: Omit<User, "password">;
+  user: User;
 }
 
 // ============================================
@@ -123,12 +140,12 @@ export interface AuthResponse {
 // ============================================
 
 export interface StatusBadgeProps {
-  status: string;
+  status: UserRole | TaskStatus;
 }
 
 export interface TaskActionsProps {
   taskId: string;
-  currentStatus: string;
+  currentStatus: TaskStatus;
   currentFeedback: string | null;
   onStatusChange: () => void;
 }
@@ -144,6 +161,14 @@ export interface CardProps {
   className?: string;
 }
 
+export interface CardHeaderProps {
+  children?: React.ReactNode;
+  className?: string;
+  title?: string;
+  description?: string;
+  action?: React.ReactNode;
+}
+
 // ============================================
 // Form Types
 // ============================================
@@ -154,7 +179,7 @@ export interface LoginFormData {
 }
 
 export interface RegisterFormData {
-  name?: string;
+  name: string | null;
   email: string;
   password: string;
 }
@@ -165,3 +190,89 @@ export interface RegisterFormData {
 
 export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;
+
+// ============================================
+// Database Mapping Helpers
+// ============================================
+
+/**
+ * Maps a Prisma User result to the domain User type.
+ * This ensures consistent types across the application.
+ */
+export function mapToUser(dbUser: {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: Date | null;
+}): User {
+  return {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    role: dbUser.role as UserRole,
+    createdAt: dbUser.createdAt,
+  };
+}
+
+/**
+ * Maps a Prisma Task result to the domain Task type.
+ */
+export function mapToTask(dbTask: {
+  id: string;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  status: string;
+  feedback: string | null;
+  userId: string;
+  createdAt: Date;
+}): Task {
+  return {
+    id: dbTask.id,
+    title: dbTask.title,
+    description: dbTask.description,
+    fileUrl: dbTask.fileUrl,
+    status: dbTask.status as TaskStatus,
+    feedback: dbTask.feedback,
+    userId: dbTask.userId,
+    createdAt: dbTask.createdAt,
+  };
+}
+
+/**
+ * Maps a Prisma Task with User relation to TaskWithUser type.
+ */
+export function mapToTaskWithUser(
+  dbTask: {
+    id: string;
+    title: string;
+    description: string | null;
+    fileUrl: string | null;
+    status: string;
+    feedback: string | null;
+    userId: string;
+    createdAt: Date;
+    user: {
+      id: string;
+      name: string | null;
+      email: string;
+    };
+  },
+): TaskWithUser {
+  return {
+    id: dbTask.id,
+    title: dbTask.title,
+    description: dbTask.description,
+    fileUrl: dbTask.fileUrl,
+    status: dbTask.status as TaskStatus,
+    feedback: dbTask.feedback,
+    userId: dbTask.userId,
+    createdAt: dbTask.createdAt,
+    user: {
+      id: dbTask.user.id,
+      name: dbTask.user.name,
+      email: dbTask.user.email,
+    },
+  };
+}

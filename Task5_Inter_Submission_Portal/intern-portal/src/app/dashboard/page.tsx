@@ -7,7 +7,7 @@ import TaskActionsWrapper from "@/components/TaskActionsWrapper";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
-import { Task, TaskWithUser, DashboardStats, UserWithTasks } from "@/types";
+import type { Task, TaskWithUser, DashboardStats, User, UserRole, TaskStatus, UserWithTasks } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default async function DashboardPage({
 
   const { error } = await searchParams;
 
-  const user = await prisma.user.findUnique({
+  const userFromDb = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
       tasks: {
@@ -42,17 +42,40 @@ export default async function DashboardPage({
     },
   });
 
-  if (!user) {
+  if (!userFromDb) {
     redirect("/login");
   }
 
-  const typedUser = user as UserWithTasks;
-  const isAdmin = typedUser.role === "ADMIN";
-  
+  // Map Prisma result to domain User type
+  const user: User = {
+    id: userFromDb.id,
+    email: userFromDb.email,
+    name: userFromDb.name,
+    role: userFromDb.role as UserRole,
+    createdAt: userFromDb.createdAt,
+  };
+
+  // Create UserWithTasks for intern dashboard
+  const userWithTasks: UserWithTasks = {
+    ...user,
+    tasks: userFromDb.tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      fileUrl: t.fileUrl,
+      status: t.status as TaskStatus,
+      feedback: t.feedback,
+      userId: t.userId,
+      createdAt: t.createdAt,
+    })),
+  };
+
+  const isAdmin = user.role === "ADMIN";
+
   let allTasks: TaskWithUser[] = [];
 
   if (isAdmin) {
-    allTasks = await prisma.task.findMany({
+    const tasksFromDb = await prisma.task.findMany({
       include: {
         user: {
           select: {
@@ -63,18 +86,35 @@ export default async function DashboardPage({
         },
       },
       orderBy: { createdAt: "desc" },
-    }) as TaskWithUser[];
+    });
+
+    // Map to TaskWithUser type
+    allTasks = tasksFromDb.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      fileUrl: t.fileUrl,
+      status: t.status as TaskStatus,
+      feedback: t.feedback,
+      userId: t.userId,
+      createdAt: t.createdAt,
+      user: {
+        id: t.user.id,
+        name: t.user.name,
+        email: t.user.email,
+      },
+    }));
   }
 
   // Database-level aggregation for better performance
   const statsData = await prisma.task.groupBy({
     by: ["status"],
-    where: { userId: typedUser.id },
+    where: { userId: user.id },
     _count: true,
   });
 
   const stats: DashboardStats = {
-    total: typedUser.tasks.length,
+    total: userWithTasks.tasks.length,
     pending: statsData.find((s) => s.status === "PENDING")?._count || 0,
     approved: statsData.find((s) => s.status === "APPROVED")?._count || 0,
     rejected: statsData.find((s) => s.status === "REJECTED")?._count || 0,
@@ -89,16 +129,16 @@ export default async function DashboardPage({
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="mt-1 text-sm text-gray-600">
-                Welcome back, {typedUser.name || typedUser.email}
+                Welcome back, {user.name || user.email}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium text-gray-900">
-                  {typedUser.name || "User"}
+                  {user.name || "User"}
                 </p>
                 <p className="mt-1">
-                  <StatusBadge status={typedUser.role} />
+                  <StatusBadge status={user.role} />
                 </p>
               </div>
               <LogoutButton />
@@ -138,7 +178,7 @@ export default async function DashboardPage({
         {isAdmin ? (
           <AdminDashboard tasks={allTasks} />
         ) : (
-          <InternDashboard tasks={typedUser.tasks} />
+          <InternDashboard tasks={userWithTasks.tasks} />
         )}
       </div>
     </div>
@@ -194,7 +234,7 @@ function InternDashboard({ tasks }: { tasks: Task[] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {tasks.map((task: Task) => (
+                {tasks.map((task) => (
                   <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {task.title}
@@ -277,15 +317,15 @@ function AdminDashboard({ tasks }: { tasks: TaskWithUser[] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {tasks.map((task: TaskWithUser) => (
+                {tasks.map((task) => (
                   <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {task.title}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div>
-                        <p className="text-gray-900">{task.user?.name || "N/A"}</p>
-                        <p className="text-xs text-gray-500">{task.user?.email || ""}</p>
+                        <p className="text-gray-900">{task.user.name || "N/A"}</p>
+                        <p className="text-xs text-gray-500">{task.user.email}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm">

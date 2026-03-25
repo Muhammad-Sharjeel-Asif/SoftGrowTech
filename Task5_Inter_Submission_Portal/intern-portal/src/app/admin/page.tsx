@@ -6,7 +6,7 @@ import LogoutButton from "@/components/LogoutButton";
 import StatCard from "@/components/StatCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import StatusBadge from "@/components/StatusBadge";
-import { UserWithTaskCount, TaskWithUser, AdminStats } from "@/types";
+import type { User, Task, TaskWithUser, AdminStats, UserRole, TaskStatus, UserWithTaskCount } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
     redirect("/dashboard?error=unauthorized");
   }
 
-  const users = await prisma.user.findMany({
+  const usersFromDb = await prisma.user.findMany({
     select: {
       id: true,
       name: true,
@@ -44,10 +44,20 @@ export default async function AdminDashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const typedUsers = users as UserWithTaskCount[];
+  // Map to UserWithTaskCount type
+  const users: UserWithTaskCount[] = usersFromDb.map((u) => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role as UserRole,
+    createdAt: u.createdAt,
+    _count: {
+      tasks: u._count.tasks,
+    },
+  }));
 
   // Parallel queries for better performance
-  const [tasks, totalTasks, pendingTasks, approvedTasks] = await Promise.all([
+  const [tasksFromDb, totalTasks, pendingTasks, approvedTasks] = await Promise.all([
     prisma.task.findMany({
       select: {
         id: true,
@@ -69,10 +79,25 @@ export default async function AdminDashboardPage() {
     prisma.task.count({ where: { status: "APPROVED" } }),
   ]);
 
-  const typedTasks = tasks as TaskWithUser[];
+  // Map to TaskWithUser type (minimal user info for recent tasks list)
+  const tasks: TaskWithUser[] = tasksFromDb.map((t) => ({
+    id: t.id,
+    title: t.title,
+    description: null,
+    fileUrl: null,
+    status: t.status as TaskStatus,
+    feedback: null,
+    userId: "", // Not available in this query
+    createdAt: t.createdAt,
+    user: {
+      id: "", // Not available in this query
+      name: t.user.name,
+      email: t.user.email,
+    },
+  }));
 
   const stats: AdminStats = {
-    totalUsers: typedUsers.length,
+    totalUsers: users.length,
     totalTasks,
     pendingTasks,
     approvedTasks,
@@ -126,7 +151,7 @@ export default async function AdminDashboardPage() {
               <CardTitle>Recent Submissions</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {typedTasks.length === 0 ? (
+              {tasks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <p className="text-sm text-gray-500">No submissions yet</p>
                 </div>
@@ -150,7 +175,7 @@ export default async function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {typedTasks.map((task: TaskWithUser) => (
+                      {tasks.map((task) => (
                         <tr key={task.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm font-medium text-gray-900">
                             {task.title}
@@ -202,7 +227,7 @@ export default async function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {typedUsers.map((user: UserWithTaskCount) => (
+                  {users.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
                         {user.name || "N/A"}

@@ -5,16 +5,48 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { showToast } from "@/lib/toast";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { Card, CardContent } from "@/components/Card";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
 
 function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  function validateForm(): boolean {
+    const newErrors: FormErrors = {};
+
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
+    setErrors({});
 
     try {
       const result = await signIn("credentials", {
@@ -46,69 +78,57 @@ function LoginForm() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
+      <Card>
+        <CardContent>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              required
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              placeholder="you@example.com"
+              error={errors.email}
+              disabled={loading}
             />
-          </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
+            <Input
               id="password"
               name="password"
               type="password"
               autoComplete="current-password"
-              required
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              placeholder="••••••••"
+              error={errors.password}
+              disabled={loading}
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="w-full"
+              isLoading={loading}
             >
-              Sign up
-            </Link>
-          </p>
-        </div>
-      </div>
+              {loading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -122,13 +142,15 @@ function LoadingFallback() {
           Sign in to your account to continue
         </p>
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 rounded-lg bg-gray-200" />
-          <div className="h-10 rounded-lg bg-gray-200" />
-          <div className="h-10 rounded-lg bg-blue-200" />
-        </div>
-      </div>
+      <Card>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 rounded-lg bg-gray-200" />
+            <div className="h-10 rounded-lg bg-gray-200" />
+            <div className="h-10 rounded-lg bg-blue-200" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { loginSchema } from "@/lib/schemas";
+import type { UserRole } from "@/types";
+import { ErrorCode } from "@/lib/apiTypes";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,40 +15,51 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        // 1. Validate credentials exist
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required");
         }
 
-        // Rate limiting can be added here in future
-
-        // Validate input
+        // 2. Validate input format using Zod
         const validation = loginSchema.safeParse(credentials);
+
         if (!validation.success) {
-          throw new Error("Invalid email or password format");
+          const error = validation.error.issues[0];
+          throw new Error(error?.message || "Invalid email or password format");
         }
 
         const { email, password } = validation.data;
 
+        // 3. Find user by email
         const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true,
+          },
         });
 
         if (!user) {
-          // Use same error message to prevent user enumeration
+          // Use generic error to prevent user enumeration
           throw new Error("Invalid email or password");
         }
 
+        // 4. Verify password
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
         }
 
+        // 5. Return user object (without password)
         return {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: user.role as UserRole,
         };
       },
     }),
@@ -59,14 +72,18 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role as "INTERN" | "ADMIN";
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role as UserRole;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as "INTERN" | "ADMIN";
+        session.user.email = token.email as string;
+        session.user.name = token.name as string | null;
+        session.user.role = token.role as UserRole;
       }
       return session;
     },
