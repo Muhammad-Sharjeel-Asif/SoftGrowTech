@@ -18,6 +18,23 @@ type DbUser = {
   createdAt: Date;
 };
 
+// Type for Prisma task query result with user relation
+type DbTaskWithUser = {
+  id: string;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  status: string;
+  feedback: string | null;
+  userId: string;
+  createdAt: Date;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+};
+
 /**
  * GET /api/tasks/[id]
  * Get single task by ID with IDOR protection
@@ -76,7 +93,7 @@ export async function GET(
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbTaskWithUser | null;
 
     if (!taskFromDb) {
       return apiError(ErrorCode.NOT_FOUND, "Task not found", 404);
@@ -231,7 +248,11 @@ export async function PATCH(
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbTaskWithUser | null;
+
+    if (!taskFromDb) {
+      return apiError(ErrorCode.NOT_FOUND, "Task not found", 404);
+    }
 
     // Map to TaskWithUser type
     const task: TaskWithUser = {
