@@ -9,6 +9,15 @@ import type { Task, TaskWithUser, User, UserRole, TaskStatus } from "@/types";
 import { mapToUser } from "@/types";
 import { ErrorCode } from "@/lib/apiTypes";
 
+// Type for Prisma user query result
+type DbUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: Date;
+};
+
 /**
  * GET /api/tasks/[id]
  * Get single task by ID with IDOR protection
@@ -40,7 +49,7 @@ export async function GET(
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbUser | null;
 
     if (!userFromDb) {
       return apiError(ErrorCode.NOT_FOUND, "User not found", 404);
@@ -141,7 +150,7 @@ export async function PATCH(
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbUser | null;
 
     if (!userFromDb) {
       return apiError(ErrorCode.NOT_FOUND, "User not found", 404);
