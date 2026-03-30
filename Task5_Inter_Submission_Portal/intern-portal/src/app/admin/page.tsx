@@ -30,6 +30,18 @@ type DbUserWithTaskCount = {
   };
 };
 
+// Type for the Prisma task query result with user relation
+type DbTaskWithUser = {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: Date;
+  user: {
+    name: string | null;
+    email: string;
+  };
+};
+
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
 
@@ -92,7 +104,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   // Map to TaskWithUser type (minimal user info for recent tasks list)
-  const tasks: TaskWithUser[] = tasksFromDb.map((t) => ({
+  const tasks: TaskWithUser[] = tasksFromDb.map((t: DbTaskWithUser) => ({
     id: t.id,
     title: t.title,
     description: null,
