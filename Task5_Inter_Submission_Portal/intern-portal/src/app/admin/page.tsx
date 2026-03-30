@@ -18,6 +18,18 @@ export const metadata: Metadata = {
   },
 };
 
+// Type for the Prisma query result with task count
+type DbUserWithTaskCount = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: UserRole;
+  createdAt: Date;
+  _count: {
+    tasks: number;
+  };
+};
+
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
 
@@ -45,7 +57,7 @@ export default async function AdminDashboardPage() {
   });
 
   // Map to UserWithTaskCount type
-  const users: UserWithTaskCount[] = usersFromDb.map((u) => ({
+  const users: UserWithTaskCount[] = usersFromDb.map((u: DbUserWithTaskCount) => ({
     id: u.id,
     email: u.email,
     name: u.name,
