@@ -9,6 +9,44 @@ import type { Task, TaskWithUser, User, UserRole, TaskStatus } from "@/types";
 import { mapToUser, mapToTask } from "@/types";
 import { ErrorCode } from "@/lib/apiTypes";
 
+// Type for Prisma user query result
+type DbUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: Date;
+};
+
+// Type for Prisma task query result with user relation
+type DbTaskWithUser = {
+  id: string;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  status: string;
+  feedback: string | null;
+  userId: string;
+  createdAt: Date;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+};
+
+// Type for Prisma task query result (without relations)
+type DbTask = {
+  id: string;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  status: string;
+  feedback: string | null;
+  userId: string;
+  createdAt: Date;
+};
+
 /**
  * GET /api/tasks
  * List tasks - Admin sees all, Interns see only their own
@@ -34,7 +72,7 @@ export async function GET(req: NextRequest) {
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbUser | null;
 
     if (!userFromDb) {
       return apiError(ErrorCode.NOT_FOUND, "User not found", 404);
@@ -61,10 +99,10 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "desc" },
         }),
         DB_QUERY_TIMEOUT_MS
-      );
+      ) as DbTaskWithUser[];
 
       // Map to TaskWithUser type
-      tasks = tasksFromDb.map((t) => ({
+      tasks = tasksFromDb.map((t: DbTaskWithUser) => ({
         id: t.id,
         title: t.title,
         description: t.description,
@@ -87,9 +125,9 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "desc" },
         }),
         DB_QUERY_TIMEOUT_MS
-      );
+      ) as DbTask[];
 
-      tasks = tasksFromDb.map((t) => mapToTask(t));
+      tasks = tasksFromDb.map((t: DbTask) => mapToTask(t));
     }
 
     return apiSuccess({ tasks }, "Tasks retrieved successfully");
@@ -168,7 +206,7 @@ export async function POST(req: NextRequest) {
         },
       }),
       DB_QUERY_TIMEOUT_MS
-    );
+    ) as DbTask;
 
     const task: Task = mapToTask(taskFromDb);
 
